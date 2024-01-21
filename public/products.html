@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        
+    }
+
+    h1 {
+        color: #ef8354;
+    }
+
+    form {
+            
+        width: 800px;
+        max-width: 100%;
+        padding: 20px;
+        background-color: #30475e;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        animation: fadeInUp 0.8s ease-out;
+        margin-bottom: 20px;
+    }
+
+        label {
+            font-weight: bold;
+            color: #e1dede;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #222b3e;
+            color: #fff;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            background-color: #ef8354;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #d8572a;
+        }
+
+        #productList {
+            margin-top: 20px;
+        }
+
+        #productList table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            background-color: #30475e;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        #productList th, #productList td {
+            border: 1px solid #47597e;
+            padding: 14px;
+            text-align: left;
+            color: #f9f9f9;
+            font-size: 16px;
+        }
+
+        #productList th {
+            background-color: #ef8354;
+        }
+        nav {
+            width: 150px;
+            height: 100vh;
+            background-color: #30475e;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+
+        nav img {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+    <title>Product List App</title>
+</head>
+<body>
+    <nav>
+        <a href="/dashboard.html"><img src="./download.png" alt="Mobile Shop Logo"></a>
+        <a href="/sales-main.html">Dashboard</a>
+        <a href="/sales.html">Sales</a>
+        <a href="/inventory.html">Inventory</a>
+        <a href="/supplier-list.html">Supplier List</a>
+        <a href="/category-list.html">Category List</a>
+        <a href="/products.html">Product List</a>
+    </nav>
+    <div class="container">
+        <h1>Create a New Product</h1>
+        <form id="productForm">
+            <label for="sku">SKU:</label>
+            <input type="text" id="sku" value="" requi>
+
+            <label for="category">Category:</label>
+            <select id="category" required>
+                <!-- Categories will be dynamically added here -->
+            </select>
+
+            <label for="productName">Product Name:</label>
+            <input type="text" id="productName" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" required></textarea>
+
+            <label for="price">Price:</label>
+            <input type="number" id="price" step="0.01" required>
+
+            <button type="button" id="saveButton" onclick="saveProduct()">Save</button>
+        </form>
+        <div id="productList">
+            <h2>Product List</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Category</th>
+                        <th>Product Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+   
+
+<script>
+    // Function to generate a random SKU
+    function generateRandomSKU() {
+        return new Promise(resolve => {
+            resolve(Math.floor(10000 + Math.random() * 90000));
+        });
+    }
+    // Function to save or update a product
+    async function saveProduct() {
+        try {
+            const sku = document.getElementById('sku').value;
+            const categoryNameSelect = document.getElementById('category');
+            const categoryName = categoryNameSelect.options[categoryNameSelect.selectedIndex].text;
+            
+            const productName = document.getElementById('productName').value;
+            const description = document.getElementById('description').value;
+            const price = document.getElementById('price').value;
+    
+            // Validate input (you may add more validation)
+            if (!sku || !categoryName || !productName || !description || !price) {
+                alert('Please fill in all fields.');
+                return;
+            }
+    
+            const method = sku ? 'PUT' : 'POST';
+            const url = sku ? `/api/products/${sku}` : '/api/products';
+    
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sku,
+                    categoryName,
+                    productName,
+                    description,
+                    price,
+                }),
+            });
+    
+            if (response.ok) {
+                alert(sku ? 'Product updated successfully!' : 'Product saved successfully!');
+                // Optionally, you can reset the form or redirect to another page
+                fetchAndDisplayProducts(); // Refresh the product list
+            } else {
+                alert(`Failed to ${sku ? 'update' : 'save'} product. Please try again.`);
+            }
+        } catch (error) {
+            console.error('Error saving or updating product:', error);
+            alert('An error occurred. Please try again later.');
+        }
+    }
+    
+    // Function to fetch and display products
+    async function fetchAndDisplayProducts() {
+        try {
+            const response = await fetch('/api/products');
+            if (!response.ok) {
+                throw new Error(`Failed to fetch products. Status: ${response.status}`);
+            }
+    
+            const products = await response.json();
+    
+            // Clear existing table rows
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = '';
+    
+            // Populate the table with product data
+            products.forEach(product => {
+                const row = tableBody.insertRow();
+                row.insertCell(0).innerText = product.sku;
+                row.insertCell(1).innerText = product.categoryName;
+                row.insertCell(2).innerText = product.productName;
+                row.insertCell(3).innerText = product.description;
+                row.insertCell(4).innerText = product.price;
+    
+                // Add Edit and Delete buttons to each row
+                const actionsCell = row.insertCell(5);
+                const editButton = document.createElement('button');
+                editButton.innerText = 'Edit';
+                editButton.onclick = () => editProduct(product);
+                actionsCell.appendChild(editButton);
+    
+                const deleteButton = document.createElement('button');
+                deleteButton.innerText = 'Delete';
+                deleteButton.onclick = () => deleteProduct(product.sku);
+                actionsCell.appendChild(deleteButton);
+            });
+    
+            // Reset the form after displaying products
+            // Reset the form after displaying products
+document.getElementById('productForm').reset();
+// Reset button text to 'Save'
+        } catch (error) {
+            console.error('Error fetching products:', error);
+            alert('Failed to fetch products. Please try again.');
+        }
+    }
+    
+    //Function to edit a product
+    function editProduct(product) {
+     document.getElementById('sku').value = product.sku;
+     document.getElementById('category').value = product.categoryName;
+    document.getElementById('productName').value = product.productName;
+     document.getElementById('description').value = product.description;
+      document.getElementById('price').value = product.price;
+    
+      
+       document.getElementById('saveButton').innerText = 'Update';
+    }
+    
+    // Function to delete a product
+    async function deleteProduct(sku) {
+        // Make an API request to delete the product on the server
+        try {
+            const response = await fetch(`/api/products/${sku}`, {
+                method: 'DELETE',
+            });
+    
+            if (response.ok) {
+                fetchAndDisplayProducts(); // Refresh the product list
+                alert('Product deleted successfully!');
+            } else {
+                console.error('Failed to delete product');
+                alert('Failed to delete product. Please try again.');
+            }
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            alert('An error occurred while deleting the product. Please try again later.');
+        }
+    }
+    
+   // Function to generate a random SKU
+// Function to generate a random SKU
+async function generateRandomSKU() {
+    try {
+        const randomSKU = Math.floor(10000 + Math.random() * 90000);
+        console.log('Generated SKU:', randomSKU);
+        return randomSKU;
+    } catch (error) {
+        console.error('Error generating SKU:', error);
+        throw error;
+    }
+}
+
+// ...
+
+// Fetch and display products when the page is loaded
+document.addEventListener('DOMContentLoaded', async function () {
+    // Fetch categories from the server and populate the dropdown
+    const categorySelect = document.getElementById('category');
+
+    try {
+        const response = await fetch('/categories');
+        const categories = await response.json();
+
+        categories.forEach(function (category) {
+            const option = document.createElement('option');
+            option.value = category.name;
+            option.text = category.name;
+            categorySelect.add(option);
+        });
+    } catch (error) {
+        console.error('Error fetching categories:', error);
+    }
+
+    // Generate and display SKU when the page is loaded
+    try {
+      const sku = await generateRandomSKU();
+       console.log('Final SKU:', sku);
+
+        // Set SKU input value
+      const skuInput = document.getElementById('sku');
+     console.log('Before setting SKU input value:', skuInput.value);
+     skuInput.value = sku;
+     console.log('After setting SKU input value:', skuInput.value);
+
+        // Fetch and display products when the page is loaded
+        fetchAndDisplayProducts();
+    } catch (error) {
+        console.error('Error generating SKU:', error);
+        alert('Failed to generate SKU. Please try again.');
+    }
+});
+
+// ...
+function goBack() {
+    window.history.back();
+  }
+    
+</script>
+
+
+</body>
+</html>

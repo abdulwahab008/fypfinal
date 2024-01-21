@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mobile Shop Management System - Report Generation</title>
+<style>
+    body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  .report-options {
+    margin-bottom: 20px;
+  }
+  #report-type{
+    font-size: medium;
+
+  }
+  #date-range{
+    font-size: medium;
+  }
+  
+  #report-output {
+    margin-top: 20px;
+    border: 1px solid #ccc;
+    padding: 10px;
+  }
+  button{
+    background-color: blue;
+    color:aliceblue;
+    border: none;
+    font-size: medium;
+  }
+  </style>
+</head>
+<body>
+  <h1>Report Generation</h1>
+
+  <div class="report-options">
+    <label for="report-type">Select Report Type:</label>
+    <select id="report-type">
+      <option value="sales">Sales Report</option>
+      <option value="loan">Loan Report</option>
+      <option value="stock">Stock Report</option>
+      <option value="commission">Daily Commission Report</option>
+      <option value="closing">Daily Closing Report</option>
+    </select>
+    <br>
+    <br>
+    <label for="date-range">Select Date Range:</label>
+    <select id="date-range">
+      <option value="daily">Daily</option>
+      <option value="monthly">Monthly</option>
+      <option value="specific">Specific Date</option>
+    </select>
+
+    <div id="specific-date" style="display: none;">
+      <label for="selected-date">Select Date:</label>
+      <input type="date" id="selected-date">
+    </div><br><br>
+
+    <button onclick="generateReport()">Generate Report</button>
+  </div>
+
+  <div id="report-output">
+    
+  </div>
+<button onclick="goBack()">Back</button>
+
+  </div>
+
+  <script>
+    function generateReport() {
+        var reportType = document.getElementById("report-type").value;
+        var dateRange = document.getElementById("date-range").value;
+        var specificDate = document.getElementById("selected-date").value;
+        var reportOutput = document.getElementById("report-output");
+      
+     
+        reportOutput.innerHTML = "";
+
+        if (reportType === "sales") {
+          reportOutput.innerHTML = "Sales Report Generated for " + dateRange + " date range";
+
+        } else if (reportType === "loan") {
+          reportOutput.innerHTML = "Loan Report Generated for " + dateRange + " date range";
+      
+        } else if (reportType === "stock") {
+          reportOutput.innerHTML = "Stock Report Generated for " + dateRange + " date range";
+
+        } else if (reportType === "commission") {
+          reportOutput.innerHTML = "Daily Commission Report Generated for " + dateRange + " date range";
+
+        } else if (reportType === "closing") {
+          reportOutput.innerHTML = "Daily Closing Report Generated for " + dateRange + " date range";
+        }
+      }
+      
+      document.getElementById("date-range").addEventListener("change", function() {
+        var selectedValue = this.value;
+        var specificDateDiv = document.getElementById("specific-date");
+      
+        if (selectedValue === "specific") {
+          specificDateDiv.style.display = "block";
+        } else {
+          specificDateDiv.style.display = "none";
+        }
+      });
+      function goBack(){
+        window.history.back();
+      }
+      
+  </script>
+</body>
+</html>
+  <td><input class="editable-input" type="number" name="total-cash" readonly></td>
+                  <td><input class="editable-input" type="number" value="" readonly></td>

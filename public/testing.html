@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receive Loan</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #1a1a1a, #1a1a1a);
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #262626;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 700px;
+            text-align: center;
+            animation: slideIn 1s;
+        }
+
+        h2 {
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #ffffff;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ffffff;
+            border-radius: 5px;
+            background-color: #262626;
+            color: #ffffff;
+        }
+
+        input[type="date"] {
+            appearance: none;
+            padding: 10px;
+        }
+
+        button {
+            background-color: #ef8354;
+            color: #ffffff;
+            padding: 9px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #d35400;
+        }
+
+        input[type="submit"] {
+            background-color: #ef8354;
+            color: #ffffff;
+        }
+
+        input[type="submit"]:hover {
+            background-color:  #d8572a;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #ffffff;
+            background-color: #262626;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ef8354;
+            color: white;
+        }
+
+        /* Styling for success message */
+        #successMessage {
+            color: rgb(244, 217, 9);
+            font-size: 18px;
+            background-color: #262626;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: #333;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+    
+        .navbar img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+    
+        .navbar a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-bottom: 15px;
+            transition: color 0.3s ease;
+        }
+    
+        .navbar a:hover {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="navbar">
+            <a href="dashboard.html"><img src="./download.png" alt="User Photo"></a>
+            <a href="./give-loan.html">Give Loan</a>
+            <a href="./receive-loan.html">Receive Loan</a>
+            <a href="./customer-list.html">Customer List</a>
+        </div>
+        <h2>Receive Loan</h2>
+        <form id="receiveLoanForm" action="/submit_loan" method="POST">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+
+            <label for="transaction_id">Transaction ID:</label>
+            <div style="display: flex;">
+                <input type="text" id="transaction_id" name="transaction_id" required>
+                <button type="button" onclick="searchTransaction()">Search</button>
+            </div>
+
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" step="0.01" required>
+
+            <label for="loan_type">Loan Type:</label>
+            <select id="loan_type" name="loan_type" onchange="toggleInstallmentOption()">
+                <option value="full_amount">Full Amount</option>
+                <option value="monthly_installment">Monthly Installments</option>
+            </select>
+
+            <div id="installmentFields" style="display: none;">
+                <label for="installment_amount">Monthly Installment Amount:</label>
+                <input type="number" id="installment_amount" name="installment_amount" step="0.01">
+
+                <label for="total_installment">Total Monthly Installments:</label>
+                <input type="number" id="total_installment" name="total_installment" step="0.01" readonly>
+
+                <label for="installment_number">Installment Number:</label>
+                <input type="number" id="installment_number" name="installment_number" value="1" required pattern="[1-9]\d*">
+
+                <label for="remaining_amount">Remaining Amount:</label>
+                <input type="number" id="remaining_amount" name="remaining_amount" step="0.01" readonly>
+            </div>
+
+            <input type="submit" value="Submit">
+        </form>
+        <div id="successMessage"></div>
+        <table id="loanTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Transaction ID</th>
+                    <th>Name</th>
+                    <th>Amount</th>
+                    <th>Loan Type</th>
+                    <th>Installment Number</th>
+                    <th>remaining Amount</th>
+                   
+                </tr>
+            </thead>
+            <tbody id="loanTableBody">
+                <!-- Data will be dynamically added here -->
+            </tbody>
+        </table>
+        <div id="successMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('date').valueAsDate = new Date();
+    
+        function calculateRemainingAmount() {
+            const totalInstallments = parseFloat(document.getElementById('total_installment').value) || 0;
+            const installmentNumber = parseFloat(document.getElementById('installment_number').value) || 0;
+            const installmentAmount = parseFloat(document.getElementById('installment_amount').value) || 0;
+    
+            const remainingAmount = (totalInstallments - installmentNumber) * installmentAmount;
+    
+            document.getElementById('remaining_amount').value = remainingAmount.toFixed(2);
+        }
+    
+        document.getElementById('installment_number').addEventListener('input', calculateRemainingAmount);
+    
+        async function toggleInstallmentOption() {
+            var loanType = document.getElementById('loan_type').value;
+            var installmentFields = document.getElementById('installmentFields');
+    
+            if (loanType === 'monthly_installment') {
+                const transactionId = document.getElementById('transaction_id').value;
+                try {
+                    const response = await fetch('http://localhost:3000/receiveloans/monthly_installment_amount', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ transaction_id: transactionId }),
+                    });
+    
+                    const data = await response.json();
+    
+                    if (response.ok) {
+                        document.getElementById('installment_amount').value = data.monthly_installment_amount;
+                        document.getElementById('total_installment').value = data.installment;
+    
+                        // Calculate and update remaining amount
+                        calculateRemainingAmount();
+    
+                        installmentFields.style.display = 'block';
+                    } else {
+                        alert('Failed to fetch monthly installment amount.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred while fetching monthly installment amount.');
+                }
+            } else {
+                // If "Full Amount" is selected, reset the values to 0
+                document.getElementById('installment_amount').value = '0';
+                document.getElementById('total_installment').value = '0';
+                document.getElementById('installment_number').value = '0';
+                document.getElementById('remaining_amount').value = '0';
+    
+                calculateRemainingAmount();  // Ensure remaining amount is updated
+    
+                installmentFields.style.display = 'none';
+            }
+        }
+    
+        async function searchTransaction() {
+            const transactionId = document.getElementById('transaction_id').value;
+    
+            try {
+                const response = await fetch('http://localhost:3000/receiveloans/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ transaction_id: transactionId }),
+                });
+    
+                const data = await response.json();
+    
+                if (response.ok) {
+                    document.getElementById('name').value = data.name;
+                    document.getElementById('amount').value = data.amount;
+                } else {
+                    alert('Loan not found for the given transaction ID');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while searching for the loan.');
+            }
+        }
+    
+        document.getElementById('receiveLoanForm').addEventListener('submit', async function (event) {
+            // Prevent the default form submission behavior
+            event.preventDefault();
+            document.getElementById('date').valueAsDate = new Date();
+            // Get form data using FormData
+            const formData = new FormData(this);
+            const loanType = formData.get('loan_type');
+            if (loanType === 'full_amount') {
+                formData.set('installment_amount', '0');
+                formData.set('total_installment', '0');
+                formData.set("installment_number", '0');
+                formData.set("remaining_amount", '0');
+            }
+            try {
+                // Send a POST request to the server
+                const response = await fetch('http://localhost:3000/receiveloans/submit_loan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData)),
+                });
+    
+                // Check if the response is okay (status code 2xx)
+                if (response.ok) {
+                    // Parse the JSON response
+                    const data = await response.json();
+                    console.log('Form submitted successfully:', data);
+    
+                    // Display success message
+                    document.getElementById('successMessage').innerHTML = 'Loan submitted successfully';
+                    // Clear the form
+                    this.reset();
+                    // Fetch and display updated data
+                    fetchDataAndDisplay();
+                } else {
+                    // Log an error if the response status is not okay
+                    console.error('Failed to submit form:', response.statusText);
+                }
+            } catch (error) {
+                // Log an error if an exception occurs during the request
+                console.error('An error occurred during form submission:', error);
+            }
+        });
+    
+        async function fetchDataAndDisplay() {
+            try {
+                const response = await fetch('http://localhost:3000/receiveloans/fetch_all');
+                const data = await response.json();
+    
+                if (response.ok) {
+                    // Clear existing table rows
+                    document.getElementById('loanTableBody').innerHTML = '';
+    
+                    // Append new rows with fetched data
+                    data.forEach(row => {
+                        const localDate = new Date(row.date).toLocaleDateString();
+                        const newRow = document.createElement('tr');
+                        newRow.innerHTML = `
+                            <td>${localDate}</td>
+                            <td>${row.transaction_id}</td>
+                            <td>${row.name}</td>
+                            <td>${row.amount}</td>
+                            <td>${row.loan_type}</td>
+                            <td>${row.installment_number}</td>
+                            <td>${row.remaining_amount}</td>
+                        `;
+                        document.getElementById('loanTableBody').appendChild(newRow);
+                    });
+                } else {
+                    console.error('Failed to fetch data:', response.statusText);
+                }
+            } catch (error) {
+                console.error('An error occurred during data fetch:', error);
+            }
+        }
+    
+        window.addEventListener('load', fetchDataAndDisplay);
+
+
+
+
+        const receiveloanModel = require('../models/receiveloanModel');
+
+        async function receiveLoan(req, res) {
+            try {
+                const { date, transaction_id, name, amount, loan_type, installment_amount, total_installment, installment_number, remaining_amount } = req.body;
+        
+                // Save received loan data to the database
+                const savedLoanId = await receiveloanModel.saveReceivedLoan(
+                    date,
+                    transaction_id,
+                    name,
+                    amount,
+                    loan_type,
+                    installment_amount,
+                    total_installment,
+                    installment_number,
+                    remaining_amount
+                );
+        
+                // Dummy response for testing
+                const response = {
+                    id: savedLoanId,
+                    date,
+                    transaction_id,
+                    name,
+                    amount,
+                    loan_type,
+                    installment_amount,
+                    total_installment,
+                    installment_number,
+                    remaining_amount,
+                };
+        
+                // Send the response
+                res.json(response);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        }
+        
+        async function searchTransaction(req, res) {
+            try {
+                const { transaction_id } = req.body;
+        
+                // Query the receiveloan table to find the associated name and amount
+                const result = await receiveloanModel.searchTransactionByTransactionId(transaction_id);
+        
+                if (result.length > 0) {
+                    // Return the name and amount if the transaction is found
+                    const data = {
+                        name: result[0].name,
+                        amount: result[0].amount,
+                    };
+                    res.status(200).json(data);
+                } else {
+                    // Return an error if the transaction is not found
+                    res.status(404).json({ error: 'Transaction not found' });
+                }
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        }
+        
+        async function getMonthlyInstallmentAmountHandler(req, res) {
+            try {
+                const { transaction_id } = req.body;
+        
+                const result = await receiveloanModel.getMonthlyInstallmentAmount(transaction_id);
+        
+                if (result.length > 0) {
+                    const data = {
+                        monthly_installment_amount: result[0].monthly_installment,
+                        installment: result[0].installment,
+                    };
+                    res.status(200).json(data);
+                } else {
+                    res.status(404).json({ error: 'Transaction not found' });
+                }
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        }
+        
+        async function fetchAllData(req, res) {
+            try {
+                const data = await receiveloanModel.fetchAllData();
+                res.status(200).json(data);
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: 'Internal Server Error' });
+            }
+        }
+        module.exports = { receiveLoan, searchTransaction, getMonthlyInstallmentAmountHandler, fetchAllData };
+        
+
+
+
+        const db = require('./db');
+
+async function saveReceivedLoan(date, transaction_id, name, amount, loan_type, installment_amount, total_installment, installment_number, remaining_amount) {
+    const query = 'INSERT INTO receiveloan (date, transaction_id, name, amount, loan_type, installment_amount, total_installment, installment_number, remaining_amount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
+    const values = [date, transaction_id, name, amount, loan_type, installment_amount, total_installment, installment_number, remaining_amount];
+
+    try {
+        const [result] = await db.query(query, values);
+        return result.insertId;
+    } catch (error) {
+        console.error(error);
+        throw new Error('Error saving received loan');
+    }
+}
+
+async function searchTransactionByTransactionId(transaction_id) {
+    const query = 'SELECT name, amount FROM giveloan WHERE transaction_id = ?';
+    const [result] = await db.query(query, [transaction_id]);
+    return result;
+}
+// Update the SQL query in getMonthlyInstallmentAmount function in receiveloanModel.js
+async function getMonthlyInstallmentAmount(transaction_id) {
+    const query = 'SELECT installment, monthly_installment FROM giveloan WHERE transaction_id = ?';
+    const [result] = await db.query(query, [transaction_id]);
+    return result;
+}
+
+async function fetchAllData() {
+    const query = 'SELECT * FROM receiveloan';
+    const [result] = await db.query(query);
+    return result;
+}
+
+module.exports = { saveReceivedLoan, searchTransactionByTransactionId, getMonthlyInstallmentAmount,fetchAllData, db };
+
+
+
+function displayCommissions(commissions) {
+    var table = document.getElementById('commissionTable');
+    table.innerHTML = ''; // Clear existing content
+  
+    // Create table headers
+    var headers = ['Date', 'Phone', 'Amount', 'Profit', 'Service'];
+    var headerRow = table.insertRow();
+    headers.forEach(header => {
+      var cell = headerRow.insertCell();
+      cell.innerHTML = `<b>${header}</b>`;
+    });
+  
+    // Create table rows
+    commissions.forEach(commission => {
+      var row = table.insertRow();
+      Object.keys(commission).forEach(key => {
+        var cell = row.insertCell();
+        var value = key === 'date' ? formatDate(commission[key]) : commission[key];
+        cell.innerHTML = value;
+      });
+    });
+  }
+
+
+
+function calculateTotal() {
+    var telenorLoad = parseFloat(document.getElementById('telenorLoad').value) || 0;
+    var zongLoad = parseFloat(document.getElementById('zongLoad').value) || 0;
+    var jazzLoad = parseFloat(document.getElementById('jazzLoad').value) || 0;
+    var ufoneLoad = parseFloat(document.getElementById('ufoneLoad').value) || 0;
+    var easypaisa = parseFloat(document.getElementById('easypaisa').value) || 0;
+    var jazzCash = parseFloat(document.getElementById('jazzCash').value) || 0;
+    var loan = parseFloat(document.getElementById('loan').value) || 0;
+    var cash = parseFloat(document.getElementById('cash').value) || 0;
+    var bank = parseFloat(document.getElementById('bank').value) || 0;
+    var credit = parseFloat(document.getElementById('credit').value) || 0;
+
+    var total = (telenorLoad + zongLoad + jazzLoad + ufoneLoad + easypaisa + jazzCash + loan + cash + bank) - credit;
+
+    document.getElementById('totalValueAmount').textContent = total.toFixed(2);
+}
+
+    </script>
+    var profit = amount / 100;
+    var discountAmount = profit * (discount / 100);
+    var finalProfit = profit - discountAmount;
+</body>
+</html>

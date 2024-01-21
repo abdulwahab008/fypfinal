@@ -1,0 +1,548 @@
+<!-- public/sales.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Module</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            
+            color: #ef8354;
+            margin-bottom: 20px;
+        }
+
+        form {
+            
+            width: 800px;
+            max-width: 100%;
+            padding: 20px;
+            background-color: #30475e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+            margin-bottom: 20px;
+        }
+     
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f9f9f9;
+        }
+
+        select,
+        input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222b3e;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #ef8354;
+            color: #fff;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+        }
+
+        button:hover {
+            background-color: #d8572a;
+        }
+
+        table {
+            width: 100%;
+            max-width: 800px;
+            border-collapse: collapse;
+            background-color: #30475e;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #47597e;
+            padding: 14px;
+            text-align: left;
+            color: #f9f9f9;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #ef8354;
+        }
+        #totalSales {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #47597e;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    
+        #totalSalesAmount {
+            font-weight: bold;
+        }
+        nav {
+            width: 150px;
+            height: 100vh;
+            background-color: #30475e;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+            float:left;
+        }
+
+        nav img {
+            width: 80%;
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-align: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        nav a.active {
+            background-color: white;
+            color: #30475e;
+        }
+        nav a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+    </style>
+    
+        
+</head>
+<body>
+    <nav>
+        <a href="/dashboard.html"><img src="./download.png" alt="Mobile Shop Logo"></a>
+
+        <a href="/sales-main.html">Dashboard</a>
+        <a href="/sales.html">Sales</a>
+        <a href="/inventory.html">Inventory</a>
+        <a href="/supplier-list.html">Supplier List</a>
+        <a href="/category-list.html">Category List</a>
+        <a href="/products.html">Product List</a>
+    </nav>
+    <div class="container">
+       
+        <form id="salesForm">
+           <br><br> <h1>Sales</h1>
+    <label for="date">Date:</label>
+    <input type="date" id="date" name="date" required>
+
+    <label for="categoryName">Category Name:</label>
+    <select id="categoryName" name="categoryName" onchange="fetchProductsByCategory()" required>
+        <!-- Categories will be dynamically added here -->
+    </select>
+
+    <label for="productName">Product Name:</label>
+    <select id="productName" name="productName" onchange="updatePrice()" required>
+        <!-- Products will be dynamically added here based on the selected category -->
+    </select>
+
+ <!-- Add oninput attribute to call updateTotal when the quantity changes -->
+<label for="quantity">Quantity:</label>
+<input type="number" id="quantity" name="quantity" min="1" required oninput="updateTotal()">
+
+<!-- Add oninput attribute to call updateTotal when the price changes -->
+<label for="price">Price:</label>
+<input type="number" id="price" name="price" step="0.01" min="0" readonly oninput="updateTotal()">
+
+
+    <label for="total">Total:</label>
+    <input type="number" id="total" name="total" step="0.01" min="0" readonly>
+
+    <button type="button" onclick="saveSalesToDatabase(event)">Save</button>
+    
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Category Name</th>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="salesDataBody">
+        <!-- This is where the sales data rows will be added dynamically -->
+    </tbody>
+</table>
+
+</div>
+<div id="totalSales">
+    <p>Total Sales:</p>
+    <span id="totalSalesAmount">0.00</span>
+</div>
+
+</body>
+
+    <script>
+
+    
+        
+    
+        async function fetchCategoryNames() {
+            try {
+                const response = await fetch('/categories', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+    
+                if (response.ok) {
+                    const categoryNames = await response.json();
+                    console.log('Category Names:', categoryNames);
+    
+                    const categoryNameSelect = document.getElementById('categoryName');
+                    const productNameSelect = document.getElementById('productName');
+    
+                    // Clear existing options
+                    categoryNameSelect.innerHTML = '';
+                    productNameSelect.innerHTML = '<option value="" disabled selected>Select a category</option>';
+    
+                    // Add new options for categories
+                    categoryNames.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category.name; // Update this line based on your object structure
+                        option.textContent = category.name; // Update this line based on your object structure
+                        categoryNameSelect.appendChild(option);
+                    });
+    
+                    // Update product names when the category selection changes
+                    categoryNameSelect.addEventListener('change', fetchProductsByCategory);
+                } else {
+                    console.error('Failed to fetch category names');
+                }
+            } catch (error) {
+                console.error('Error fetching category names:', error);
+            }
+        }
+    
+        // public/script.js
+        document.addEventListener('DOMContentLoaded', async function () {
+            // Fetch category names and populate a dropdown
+            await fetchCategoryNames();
+            
+            // Set the current date in the date input field
+            const currentDate = new Date().toISOString().split('T')[0];
+            document.getElementById('date').value = currentDate;
+        
+            // Get the category select element
+            const categoryNameSelect = document.getElementById('categoryName');
+        
+            // Add an event listener to the category select element
+            categoryNameSelect.addEventListener('change', function () {
+                fetchProductsByCategory();
+            });
+        
+            // Fetch and render sales table data
+             fetchAndRenderSalesTable();
+        });
+// ...
+
+async function attachEventListeners() {
+    try {
+        // Attach event listener for category change
+        const categoryNameSelect = document.getElementById('categoryName');
+        categoryNameSelect.addEventListener('change', function () {
+            fetchProductsByCategory();
+        });
+
+        // Attach event listener for form submission
+        const saveButton = document.querySelector('button');
+        saveButton.addEventListener('click', function (event) {
+            saveSalesToDatabase(event);
+        });
+    } catch (error) {
+        console.error('Error attaching event listeners:', error);
+    }
+}
+
+// Modify the fetchProductsByCategory function
+async function fetchProductsByCategory() {
+    const categoryNameSelect = document.getElementById('categoryName');
+    const selectedCategory = categoryNameSelect.value;
+    
+    console.log('Selected Category:', selectedCategory); // Log the selected category
+
+    try {
+        const response = await fetch(`/api/products?categoryName=${selectedCategory}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const products = await response.json();
+            console.log('Products:', products);
+
+            const productNameSelect = document.getElementById('productName');
+            const priceInput = document.getElementById('price');
+
+            // Clear existing options
+            productNameSelect.innerHTML = '<option value="">Select a product</option>';
+
+            // Add new options for products
+            products.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.productName;
+                option.textContent = product.productName;
+                option.dataset.price = product.price;
+                console.log('Option:', option);
+                productNameSelect.appendChild(option);
+            });
+            console.log('Number of Options:', productNameSelect.options.length);
+
+            // Update price when products are loaded
+            // Uncomment the line below
+             updatePrice();
+        } else {
+            console.error('Failed to fetch products');
+        }
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
+}
+
+
+function updatePrice() {
+    var productNameSelect = document.getElementById("productName");
+    var selectedProduct = productNameSelect.options[productNameSelect.selectedIndex];
+
+    if (selectedProduct) {
+        var price = selectedProduct.getAttribute("data-price");
+        document.getElementById("price").value = price || 0;
+    } else {
+        document.getElementById("price").value = 0;
+    }
+}
+
+
+    
+function updateTotal() {
+    const quantityInput = document.getElementById('quantity');
+    const priceInput = document.getElementById('price');
+    const totalInput = document.getElementById('total');
+
+    const quantity = parseFloat(quantityInput.value) || 0; // Default to 0 if not a valid number
+    const price = parseFloat(priceInput.value) || 0;
+
+    const total = (quantity * price).toFixed(2);
+    totalInput.value = total;
+}
+
+async function saveSalesToDatabase(event) {
+    event.preventDefault();
+
+    const form = document.getElementById('salesForm');
+    const data = {
+        date: form.elements.date.value,
+        categoryName: form.elements.categoryName.value,
+        productName: form.elements.productName.value,
+        quantity: parseFloat(form.elements.quantity.value),
+        price: parseFloat(form.elements.price.value),
+        total: parseFloat(form.elements.total.value),
+    };
+
+    try {
+    
+
+const response = await fetch('/api/sales/saveSalesToDatabase', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+});
+
+
+        if (response.ok) {
+            console.log('Data saved to the sales table in the database');
+            // Clear the form after saving
+            form.reset();
+            // Clear the total
+            document.getElementById('total').value = '0.00';
+            // Refresh the sales table
+            fetchAndRenderSalesTable();
+        } else {
+            console.error('Failed to save data to the sales table in the database');
+        }
+    } catch (error) {
+        console.error('Error saving to the sales table in the database:', error);
+    }
+}
+
+async function fetchAndRenderSalesTable() {
+    try {
+        // Fetch sales data from the server
+        const response = await fetch('/api/sales/fetchSalesData', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const salesData = await response.json();
+            // Render the sales data in the table
+            renderSalesTable(salesData);
+        } else {
+            console.error('Failed to fetch sales data');
+        }
+    } catch (error) {
+        console.error('Error fetching sales data:', error);
+    }
+}
+function editSales(row) {
+    const date = row.cells[0].textContent;
+    const categoryName = row.cells[1].textContent;
+    const productName = row.cells[2].textContent;
+    const quantity = row.cells[3].textContent;
+    const price = row.cells[4].textContent;
+    const total = row.cells[5].textContent;
+
+    // Populate the form with the selected sales data
+    document.getElementById('date').value = date;
+    document.getElementById('categoryName').value = categoryName;
+    document.getElementById('productName').value = productName;
+    document.getElementById('quantity').value = quantity;
+    document.getElementById('price').value = price;
+    document.getElementById('total').value = total;
+
+    // Remove the row from the table
+    row.remove();
+}
+
+function deleteSales(row) {
+    const totalSales = getTotalSales(); // Get total sales before deletion
+    const totalSalesAmountElement = document.getElementById('totalSalesAmount');
+
+    // Subtract the deleted sales from the total sales
+    const deletedSales = parseFloat(row.cells[5].textContent) || 0;
+    const newTotalSales = totalSales - deletedSales;
+
+    // Update the total sales amount in the HTML
+    totalSalesAmountElement.textContent = newTotalSales.toFixed(2);
+
+    // Remove the row from the table
+    row.remove();
+}
+    
+function renderSalesTable(data) {
+    const tableBody = document.getElementById('salesDataBody');
+    const totalSalesAmountElement = document.getElementById('totalSalesAmount');
+
+    if (!tableBody || !totalSalesAmountElement) {
+        console.error('Error: Table body or total sales amount element not found.');
+        return;
+    }
+
+    tableBody.innerHTML = '';
+    let totalSales = 0;
+
+    data.forEach(row => {
+        const newRow = tableBody.insertRow(-1);
+        newRow.innerHTML = `<td>${row.date}</td>
+                            <td>${row.categoryName}</td>
+                            <td>${row.productName}</td>
+                            <td>${row.quantity}</td>
+                            <td>${row.price}</td>
+                            <td>${row.total}</td>
+                            <td>
+                                <button onclick="printReceipt(this)">Print</button>
+                                <button onclick="editSales(this.parentNode.parentNode)">Edit</button>
+                                <button onclick="deleteSales(this.parentNode.parentNode)">Delete</button>
+                            </td>`;
+
+        totalSales += parseFloat(row.total) || 0;
+    });
+
+    totalSalesAmountElement.textContent = totalSales.toFixed(2);
+}
+
+
+function printReceipt(row) {
+        const date = row.cells[0].textContent;
+        const categoryName = row.cells[1].textContent;
+        const productName = row.cells[2].textContent;
+        const quantity = row.cells[3].textContent;
+        const price = row.cells[4].textContent;
+        const total = row.cells[5].textContent;
+
+        const receiptContent = `Date: ${date}\n
+                               Category Name: ${categoryName}\n
+                               Product Name: ${productName}\n
+                               Quantity: ${quantity}\n
+                               Price: ${price}\n
+                               Total: ${total}`;
+
+        // Create a new window for printing
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write('<html><head><title>Print Receipt</title></head><body>');
+        printWindow.document.write(`<pre>${receiptContent}</pre>`);
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+
+        // Print the window
+        printWindow.print();
+    }
+
+
+function getTotalSales() {
+    const totalSalesAmountElement = document.getElementById('totalSalesAmount');
+    const totalSales = parseFloat(totalSalesAmountElement.textContent) || 0;
+    console.log('Total Sales in sales.html:', totalSales);
+    return totalSales;
+}
+
+
+</script>
+</body>
+
+</html>
+
+
+    

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Closing App</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            margin: 0;
+           
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+      
+
+        h1 {
+            color: #ef8354;
+            margin-bottom: 20px;
+        }
+
+        form {
+            width: 400px;
+            padding: 20px;
+            background-color: #30475e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f9f9f9;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222b3e;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            background-color: #ef8354;
+            color: #fff;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+        }
+
+        button:hover {
+            background-color: #d8572a;
+        }
+
+        table {
+            width: 400px;
+            border-collapse: collapse;
+            background-color: #30475e;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+        }
+
+        th,
+        td {
+            border: 1px solid #47597e;
+            padding: 14px;
+            text-align: left;
+            color: #f9f9f9;
+            font-size: 16px;
+        }
+
+        th {
+            background-color: #ef8354;
+        }
+
+        #totalValue {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #47597e;
+            border-radius: 10px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            background-color: #ef8354;
+            margin-top: 10px;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+      
+        .back-button:hover {
+            background-color: #d8572a;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+</div>
+    <h1>Daily Closing App</h1>
+
+    <form id="closingForm" onsubmit="saveClosing(event)">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="telenorLoad">Telenor Load:</label>
+        <input type="number" id="telenorLoad" name="telenorLoad" required>
+
+        <label for="zongLoad">Zong Load:</label>
+        <input type="number" id="zongLoad" name="zongLoad" required>
+
+        <label for="jazzLoad">Jazz Load:</label>
+        <input type="number" id="jazzLoad" name="jazzLoad" required>
+
+        <label for="ufoneLoad">Ufone Load:</label>
+        <input type="number" id="ufoneLoad" name="ufoneLoad" required>
+
+        <label for="easypaisa">Easypaisa:</label>
+        <input type="number" id="easypaisa" name="easypaisa" required>
+
+        <label for="jazzCash">JazzCash:</label>
+        <input type="number" id="jazzCash" name="jazzCash" required>
+        <label for="loan">Loan:</label>
+        <input type="number" id="loan" name="loan" required>
+
+        <label for="cash">Cash:</label>
+        <input type="number" id="cash" name="cash" required>
+
+        <label for="bank">Bank:</label>
+        <input type="number" id="bank" name="bank" required>
+
+        <label for="credit">Credit:</label>
+        <input type="number" id="credit" name="credit" required>
+
+        <button type="submit">Submit</button>
+    </form>
+    <div id="closingTableContainer">
+        <table id="closingTable">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Telenor Load</th>
+                    <th>Zong Load</th>
+                    <th>Jazz Load</th>
+                    <th>Ufone Load</th>
+                    <th>Easypaisa</th>
+                    <th>JazzCash</th>
+                    <th>Loan</th>
+                    <th>Cash</th>
+                    <th>Bank</th>
+                    <th>Credit</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody id="closingTableBody">
+             
+            </tbody>
+        </table>
+    </div>
+    <button class="back-button" onclick="goBack()">Back</button>
+</div>
+    <script>
+        function getCurrentDate() {
+            var currentDate = new Date();
+            var year = currentDate.getFullYear();
+            var month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            var day = String(currentDate.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var dateInput = document.getElementById('date');
+            dateInput.value = getCurrentDate();
+        });
+
+        
+        function saveClosing(event) {
+            event.preventDefault();
+
+            // Get form data
+            var date = getCurrentDate();
+            var telenorLoad = parseFloat(document.getElementById('telenorLoad').value) || 0;
+            var zongLoad = parseFloat(document.getElementById('zongLoad').value) || 0;
+            var jazzLoad = parseFloat(document.getElementById('jazzLoad').value) || 0;
+            var ufoneLoad = parseFloat(document.getElementById('ufoneLoad').value) || 0;
+            var easypaisa = parseFloat(document.getElementById('easypaisa').value) || 0;
+            var jazzCash = parseFloat(document.getElementById('jazzCash').value) || 0;
+            var loan = parseFloat(document.getElementById('loan').value) || 0;
+            var cash = parseFloat(document.getElementById('cash').value) || 0;
+            var bank = parseFloat(document.getElementById('bank').value) || 0;
+            var credit = parseFloat(document.getElementById('credit').value) || 0;
+
+            var total = (telenorLoad + zongLoad + jazzLoad + ufoneLoad + easypaisa + jazzCash + loan + cash + bank) - credit;
+
+            var closingData = {
+                date: date,
+                telenorLoad: telenorLoad,
+                zongLoad: zongLoad,
+                jazzLoad:jazzLoad,
+                ufoneLoad: ufoneLoad,
+                easypaisa: easypaisa,
+                jazzCash: jazzCash,
+                loan: loan,
+                cash: cash,
+                bank: bank,
+                credit: credit,
+                total: total,
+            };
+
+            fetch('/api/closings/saveClosing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(closingData),
+            })
+            .then(response => response.json())
+            .then(data => {
+              
+                console.log('Closing saved successfully:', data);
+                fetchClosingData();
+            })
+            .catch(error => {
+                console.error('Error saving closing:', error);
+            });
+        }
+
+        function fetchClosingData() {
+            fetch('/api/closings/getAllClosing')
+                .then(response => response.json())
+                .then(data => {
+              
+                    document.getElementById('closingTableBody').innerHTML = '';
+
+                   
+                    data.forEach(closing => {
+                        var row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${closing.date}</td>
+                            <td>${closing.telenorLoad}</td>
+                            <td>${closing.zongLoad}</td>
+                            <td>${closing.jazzLoad}</td>
+                            <td>${closing.ufoneLoad}</td>
+                            <td>${closing.easypaisa}</td>
+                            <td>${closing.jazzCash}</td>
+                            <td>${closing.loan}</td>
+                            <td>${closing.cash}</td>
+                            <td>${closing.bank}</td>
+                            <td>${closing.credit}</td>
+                            <td>${closing.total}</td>
+                        `;
+                        document.getElementById('closingTableBody').appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching closing data:', error);
+                });
+        }
+
+        // Call the function to fetch and display data when the page loads
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchClosingData();
+        });
+
+        function goBack() {
+            window.history.back();
+          }
+    </script>
+
+</body>
+
+</html>
+   

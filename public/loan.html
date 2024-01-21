@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Loan Application</title>
+ <style>
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f2f2f2;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+
+  .container {
+   
+    width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+
+  .loan-module {
+    display: none;
+    margin-bottom: 20px;
+  }
+
+  .loan-module h2 {
+    margin-bottom: 10px;
+    color: #333;
+    border-bottom: 2px solid #1905aa;
+    padding-bottom: 5px;
+  }
+
+  form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+  }
+
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="date"],
+  form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+  }
+
+  form input[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #1905aa;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  form input[type="submit"]:hover {
+    background-color: #866eef;
+  }
+
+  .loan-buttons {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .loan-buttons button {
+    margin-right: 10px;
+    padding: 12px;
+    background-color: #1905aa;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .loan-buttons button:hover {
+    background-color: #866eef;
+  }
+
+  #partialAmountField {
+    display: none;
+  }
+
+  #remainingAmount {
+    font-weight: bold;
+  }
+
+  .back button {
+    padding: 12px;
+    background-color: #1905aa;
+    margin-top: 10px;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .back button:hover {
+    background-color:#866eef;
+  }
+</style>>
+</head>
+<body>
+  <div class="container">
+    <h1>Loan Application</h1>
+    <div class="loan-module" id="giveLoanModule">
+      <h2>Give Loan</h2>
+      <form action="/api/loan/give" method="POST">
+        <label for="borrowerName">Borrower Name:</label>
+        <input type="text" id="borrowerName" name="borrowerName" required>
+
+        <label for="cnic">CNIC:</label>
+        <input type="text" id="cnic" name="cnic" required>
+
+        <label for="phoneNumber">Phone Number:</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required>
+
+        <label for="loanAmount">Loan Amount:</label>
+        <input type="number" id="loanAmount" name="loanAmount" required>
+
+        <label for="giveLoanDate">Date:</label>
+        <input type="date" id="giveLoanDate" name="giveLoanDate" required>
+        <label for="transactionId">Transaction ID:</label>
+        <input type="text" id="transactionId" name="transactionId" required>
+
+        <input type="submit" value="Give Loan">
+      </form>
+    </div>
+    <div class="loan-module" id="takeBackLoanModule">
+      <h2>Take Back Loan</h2>
+      <form action="/api/loan/take-back" method="POST">
+        <label for="borrowerName">Borrower Name:</label>
+        <input type="text" id="borrowerName" name="borrowerName" required>
+        
+        
+        <label for="takeBackType">Loan Return Type:</label>
+        <select id="takeBackType" name="takeBackType" onchange="togglePartialAmountField()">
+          <option value="full">Full Loan</option>
+          <option value="partial">Partial Loan</option>
+        </select>
+        
+        <div id="partialAmountField" style="display: none;">
+          <label for="partialAmount">Amount You Give Back:</label>
+          <input type="number" id="partialAmount" name="partialAmount" oninput="calculateRemainingAmount()">
+        </div>
+        
+        <label for="remainingAmount">Remaining Amount:</label>
+        <input type="number" id="remainingAmount" name="remainingAmount" readonly>
+        
+        <label for="takeBackDate">Date:</label>
+        <input type="date" id="takeBackDate" name="takeBackDate" required>
+        
+        <input type="submit" value="Take Back Loan">
+      </form>
+    </div>
+    <div class="loan-buttons">
+      <button onclick="showGiveLoanModule()">Give Loan</button>
+      <button onclick="showTakeBackLoanModule()">Take Back Loan</button>
+    </div>
+  
+  </div>
+ 
+  <script>
+    function showGiveLoanModule() {
+      document.getElementById("giveLoanModule").style.display = "block";
+      document.getElementById("takeBackLoanModule").style.display = "none";
+    }
+
+    function showTakeBackLoanModule() {
+      document.getElementById("giveLoanModule").style.display = "none";
+      document.getElementById("takeBackLoanModule").style.display = "block";
+    }
+    
+    function togglePartialAmountField() {
+      var takeBackType = document.getElementById("takeBackType").value;
+      var partialAmountField = document.getElementById("partialAmountField");
+      
+      if (takeBackType === "partial") {
+        partialAmountField.style.display = "block";
+      } else {
+        partialAmountField.style.display = "none";
+      }
+    }
+    
+    function calculateRemainingAmount() {
+      var loanAmount = parseFloat(document.getElementById("loanAmount").value);
+      var partialAmount = parseFloat(document.getElementById("partialAmount").value);
+      var remainingAmountField = document.getElementById("remainingAmount");
+      
+      if (!isNaN(loanAmount) && !isNaN(partialAmount)) {
+        var remainingAmount = loanAmount - partialAmount;
+        remainingAmountField.value = remainingAmount.toFixed(2);
+      } else {
+        remainingAmountField.value = "";
+      }
+    }
+    function goBack(){
+      window.history.back();
+    }
+  </script>
+</body>
+</html>
