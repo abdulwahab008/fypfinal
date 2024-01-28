@@ -1,16 +1,13 @@
 const db = require('./db');
 
-async function createProduct({ sku, category, productName, description, price }) {
+async function createProduct({ sku, category, productName, description, price, cost }) {
     const connection = await db.getConnection();
     try {
         await connection.beginTransaction();
 
-        // Get category ID based on category name
-        const categoryId = await getCategoryIdByName(category);
-
         const [result] = await connection.execute(
-            'INSERT INTO products (sku, categoryName, productName, description, price) VALUES (?, ?, ?, ?, ?)',
-            [sku, category, productName, description, price]
+            'INSERT INTO products (sku, categoryName, productName, description, price, cost) VALUES (?, ?, ?, ?, ?, ?)',
+            [sku, category, productName, description, price, cost]
         );
 
         await connection.commit();
@@ -22,6 +19,7 @@ async function createProduct({ sku, category, productName, description, price })
             productName,
             description,
             price,
+            cost
         };
     } catch (error) {
         console.error('Error creating product:', error);
@@ -42,6 +40,52 @@ async function getAllProducts() {
     }
 }
 
+async function updateProduct({ sku, category, productName, description, price, cost }) {
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        const [result] = await connection.execute(
+            'UPDATE products SET categoryName=?, productName=?, description=?, price=?, cost=? WHERE sku=?',
+            [category, productName, description, price, cost, sku]
+        );
+
+        await connection.commit();
+
+        return {
+            sku,
+            category,
+            productName,
+            description,
+            price,
+            cost
+        };
+    } catch (error) {
+        console.error('Error updating product:', error);
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
+async function deleteProduct(sku) {
+    const connection = await db.getConnection();
+    try {
+        await connection.beginTransaction();
+
+        await connection.execute('DELETE FROM products WHERE sku=?', [sku]);
+
+        await connection.commit();
+    } catch (error) {
+        console.error('Error deleting product:', error);
+        await connection.rollback();
+        throw error;
+    } finally {
+        connection.release();
+    }
+}
+
 async function getCategories() {
     const connection = await db.getConnection();
     try {
@@ -52,82 +96,10 @@ async function getCategories() {
     }
 }
 
-async function getCategoryIdByName(categoryName) {
-    const connection = await db.getConnection();
-    try {
-        const [result] = await connection.execute('SELECT id FROM categories WHERE name = ?', [categoryName]);
-
-        if (result.length > 0) {
-            return result[0].id;
-        } else {
-            throw new Error('Category not found');
-        }
-    } finally {
-        connection.release();
-    }
-}
-
-async function getProductBySKU(sku) {
-    const connection = await db.getConnection();
-    try {
-        const [rows] = await connection.execute('SELECT * FROM products WHERE sku = ?', [sku]);
-        return rows.length > 0 ? rows[0] : null;
-    } finally {
-        connection.release();
-    }
-}
-
-// async function editProduct({ sku, category, productName, description, price }) {
-//     const connection = await db.getConnection();
-//     try {
-//         await connection.beginTransaction();
-
-//         // Get category ID based on category name
-//         const categoryId = await getCategoryIdByName(category);
-
-//         const [result] = await connection.execute(
-//             'UPDATE products SET categoryName = ?, productName = ?, description = ?, price = ? WHERE sku = ?',
-//             [category, productName, description, price, sku]
-//         );
-
-//         await connection.commit();
-
-//         if (result.affectedRows > 0) {
-//             // Fetch the updated product after the commit
-//             const updatedProduct = await getProductBySKU(sku);
-
-//             return updatedProduct;
-//         } else {
-//             return null; // Product not found
-//         }
-//     } catch (error) {
-//         console.error('Error editing product:', error);
-//         await connection.rollback();
-//         throw error;
-//     } finally {
-//         connection.release();
-//     }
-// }
-
-async function deleteProduct(sku) {
-    const connection = await db.getConnection();
-    try {
-        const [result] = await connection.execute('DELETE FROM products WHERE sku = ?', [sku]);
-
-        if (result.affectedRows > 0) {
-            return true; // Product deleted successfully
-        } else {
-            return false; // Product not found
-        }
-    } finally {
-        connection.release();
-    }
-}
-
 module.exports = {
     createProduct,
     getAllProducts,
-    getCategories,
-    // editProduct,
+    updateProduct,
     deleteProduct,
+    getCategories,
 };

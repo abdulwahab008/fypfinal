@@ -42,7 +42,41 @@ const UserModel = {
                 connection.release();
             }
         }
-    }
+    },
+
+    saveSessionData: async (userId, sessionId, expirationDate) => {
+        try {
+            if (userId === undefined || sessionId === undefined || expirationDate === undefined) {
+                throw new Error('One or more required parameters are undefined');
+            }
+
+            const connection = await db.getConnection();
+
+            // Try to insert the session data
+            try {
+                await connection.execute(
+                    'INSERT INTO sessions (user_id, token, expires_at) VALUES (?, ?, ?)',
+                    [userId, sessionId, expirationDate]
+                );
+            } catch (insertError) {
+                // If it's a duplicate entry error, update the existing record
+                if (insertError.code === 'ER_DUP_ENTRY') {
+                    await connection.execute(
+                        'UPDATE sessions SET expires_at = ? WHERE user_id = ? AND token = ?',
+                        [expirationDate, userId, sessionId]
+                    );
+                } else {
+                    // If it's a different error, re-throw it
+                    throw insertError;
+                }
+            } finally {
+                connection.release();
+            }
+        } catch (error) {
+            console.error('Error saving session data:', error);
+            throw error;
+        }
+    },
 };
 
 module.exports = UserModel;

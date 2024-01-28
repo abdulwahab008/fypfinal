@@ -37,12 +37,12 @@ async function saveSalesToDatabase(data) {
         const connection = await pool.getConnection();
 
         // Extract data from the request body
-        const { date, categoryName, productName, quantity, price, total } = data;
+        const { date, categoryName, productName, quantity, price, cost, profit, total } = data;
 
         // Insert sales data into the 'sales' table
         await connection.query(
-            'INSERT INTO sales (date, categoryName, productName, quantity, price, total) VALUES (?, ?, ?, ?, ?, ?)',
-            [date, categoryName, productName, quantity, price, total]
+            'INSERT INTO sales (date, categoryName, productName, quantity, price, cost, profit, total) VALUES (?, ?, ?, ?, ?, ?,?, ?)',
+            [date, categoryName, productName, quantity, price, cost, profit, total]
         );
 
         connection.release();
@@ -65,10 +65,49 @@ async function fetchSalesData() {
         throw error;
     }
 }
+async function getSalesReport(dateRange) {
+    try {
+      
+  
+      const query = 'SELECT * FROM sales WHERE date BETWEEN ? AND ?'; // Replace ... with your conditions
+      const [sales] = await pool.execute(query, [dateRange.fromDate, dateRange.toDate]);
+      return sales;
+    } catch (error) {
+      throw error;
+    }
+  }
+  async function deleteSalesData(date, categoryName, productName) {
+    try {
+        console.log('Deleting Sales Data from Database:', { date, categoryName, productName });
+
+        const connection = await pool.getConnection();
+
+       
+
+        // Check if the entry exists before attempting deletion
+        const deleteResult = await connection.query('DELETE FROM sales WHERE date = ? AND categoryName = ? AND productName = ?', [date, categoryName, productName]);
+        console.log('DELETE result:', deleteResult);
+
+        if (deleteResult && deleteResult.affectedRows > 0) {
+            console.log('Sales entry deleted from the database successfully');
+        } else {
+            console.log('Sales entry not found in the database');
+        }
+
+        connection.release();
+    } catch (error) {
+        console.error('Error deleting sales data from the database:', error);
+        throw error;
+    }
+}
+
+
 
 module.exports = {
     fetchCategoryNames,
     fetchProductsByCategory,
     saveSalesToDatabase,
     fetchSalesData,
+    getSalesReport,
+    deleteSalesData
 };
