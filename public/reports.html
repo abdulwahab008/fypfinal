@@ -2,119 +2,130 @@
 <html>
 <head>
   <title>Mobile Shop Management System - Report Generation</title>
-<style>
+  <style>
     body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
-  }
-  
-  h1 {
-    text-align: center;
-  }
-  
-  .report-options {
-    margin-bottom: 20px;
-  }
-  #report-type{
-    font-size: medium;
+      background: linear-gradient(to right, #1a1a1a, #1a1a1a);
+      color: #ffffff;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
 
-  }
-  #date-range{
-    font-size: medium;
-  }
+    .container {
+      background-color: #262626;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      width: 1500px;
+      text-align: center;
+      animation: slideIn 1s;
+    }
+
+    h1 {
+      text-align: center;
+      color: #ef8354;
+      margin-bottom: 20px;
+    }
+
+    .report-options {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #ccc;
+    }
+
+    select {
+      width: 50%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 15px;
+      background-color: #1a1a1a;
+      color: #fff;
+      font-size: 16px;
+    }
+    input {
+        width: 50%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        background-color: #1a1a1a;
+        color: #fff;
+        font-size: 16px;
+      }
+
+    button {
+      background-color: #ef8354;
+      color: #ecf0f1;
+      border: none;
+      font-size: 16px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #ef8354;
+    }
+
+    #report-output {
+      margin-top: 20px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      th{
+        color:#ecf0f1;
+        background-color: #ef8354;
+      }
   
-  #report-output {
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-  }
-  button{
-    background-color: blue;
-    color:aliceblue;
-    border: none;
-    font-size: medium;
-  }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: left;
+      }
+      
   </style>
 </head>
 <body>
-  <h1>Report Generation</h1>
+  <div class="container">
+    <h1>Report Generation</h1>
 
-  <div class="report-options">
-    <label for="report-type">Select Report Type:</label>
-    <select id="report-type">
-      <option value="sales">Sales Report</option>
-      <option value="loan">Loan Report</option>
-      <option value="stock">Stock Report</option>
-      <option value="commission">Daily Commission Report</option>
-      <option value="closing">Daily Closing Report</option>
-    </select>
-    <br>
-    <br>
-    <label for="date-range">Select Date Range:</label>
-    <select id="date-range">
-      <option value="daily">Daily</option>
-      <option value="monthly">Monthly</option>
-      <option value="specific">Specific Date</option>
-    </select>
+    <div class="report-options">
+      <label for="report-type">Select Report Type:</label>
+      <select id="report-type">
+        <option value="sales">Sales Report</option>
+        <option value="stock">Stock Report</option>
+        <option value="commission">Daily Commission Report</option>
+        <option value="closing">Daily Closing Report</option>
+      </select>
+      <label for="from-date">From:</label>
+      <input type="date" id="from-date">
+      <label for="to-date">To:</label>
+      <input type="date" id="to-date"><br>
+      <button id="GenerateReport">Generate Report</button>
+      <button id="back-button">Back</button>
+    </div>
 
-    <div id="specific-date" style="display: none;">
-      <label for="selected-date">Select Date:</label>
-      <input type="date" id="selected-date">
-    </div><br><br>
-
-    <button onclick="generateReport()">Generate Report</button>
-  </div>
-
-  <div id="report-output">
+    <div id="report-output"></div>
     
   </div>
-<button onclick="goBack()">Back</button>
 
-  </div>
-
-  <script>
-    function generateReport() {
-        var reportType = document.getElementById("report-type").value;
-        var dateRange = document.getElementById("date-range").value;
-        var specificDate = document.getElementById("selected-date").value;
-        var reportOutput = document.getElementById("report-output");
-      
-     
-        reportOutput.innerHTML = "";
-
-        if (reportType === "sales") {
-          reportOutput.innerHTML = "Sales Report Generated for " + dateRange + " date range";
-
-        } else if (reportType === "loan") {
-          reportOutput.innerHTML = "Loan Report Generated for " + dateRange + " date range";
-      
-        } else if (reportType === "stock") {
-          reportOutput.innerHTML = "Stock Report Generated for " + dateRange + " date range";
-
-        } else if (reportType === "commission") {
-          reportOutput.innerHTML = "Daily Commission Report Generated for " + dateRange + " date range";
-
-        } else if (reportType === "closing") {
-          reportOutput.innerHTML = "Daily Closing Report Generated for " + dateRange + " date range";
-        }
-      }
-      
-      document.getElementById("date-range").addEventListener("change", function() {
-        var selectedValue = this.value;
-        var specificDateDiv = document.getElementById("specific-date");
-      
-        if (selectedValue === "specific") {
-          specificDateDiv.style.display = "block";
-        } else {
-          specificDateDiv.style.display = "none";
-        }
-      });
-      function goBack(){
-        window.history.back();
-      }
-      
+  <script src="./scripts/reportScript.js">
+  
   </script>
 </body>
+
 </html>
-  <td><input class="editable-input" type="number" name="total-cash" readonly></td>
-                  <td><input class="editable-input" type="number" value="" readonly></td>
