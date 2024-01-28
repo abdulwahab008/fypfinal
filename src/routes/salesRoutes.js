@@ -9,7 +9,7 @@ router.get('/categories', salesController.fetchCategoryNames);
 router.get('/api/products', salesController.fetchProductsByCategory);
 router.post('/saveSalesToDatabase', salesController.saveSalesToDatabase);
 router.get('/fetchSalesData', salesController.fetchSalesData); // Add this line
-
+router.delete('/deleteSalesData', salesController.deleteSalesData);
 
 
 module.exports = router;

@@ -46,3 +46,15 @@ exports.fetchSalesData = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
+
+exports.deleteSalesData = async (req, res) => {
+    const { date, categoryName, productName } = req.body;
+
+    try {
+        await Sales.deleteSalesData(date, categoryName, productName);
+        res.status(200).send('Data deleted successfully');
+    } catch (error) {
+        console.error('Error deleting sales data:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};

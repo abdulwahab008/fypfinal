@@ -9,5 +9,11 @@ router.post('/signup', UserController.signup);
 
 // Login route
 router.post('/login', UserController.login);
-
+router.get('/current', (req, res) => {
+    if (req.session.user) {
+        res.status(200).json({ user: req.session.user });
+    } else {
+        res.status(401).json({ error: 'User not authenticated' });
+    }
+});
 module.exports = router;

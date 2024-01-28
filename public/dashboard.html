@@ -160,11 +160,12 @@
     </div>
     <div class="user-section">
       <div class="user-picture"></div>
-      <div class="user-name">user1</div>
+      <div class="user-name" id="username-display">user1</div>
       <div class="small-navbar">
         <ul>
           <li><a href="#" id="edit-picture">Edit Picture</a></li>
-          <li><a href="./settings.html" id="settings">Settings</a></li>
+          <li><a href="./settings.html" id="settings">Profile</a></li>
+          <li><a href="./changepassword.html">Change Password</a></li>
           <li><a href="./login.html">Logout</a></li>
         </ul>
       </div>
@@ -173,7 +174,7 @@
   
   <div class="content">
     <div class="module">
-        <h2><a href="./sales-main.html"> <img src="pictures/sales.png" alt="Sales"><br>Sales</a></h2>
+        <h2><a href="./sales-main.html"> <img src="pictures/sales.png" alt="Sales"><br>Sales/Inventory</a></h2>
     </div>
     
     <div class="module">
@@ -205,30 +206,8 @@
 
   <input type="file" id="picture-upload" style="display: none;">
 
-  <script>
-    const editPictureLink = document.getElementById('edit-picture');
-    const pictureUpload = document.getElementById('picture-upload');
-    const userSection = document.querySelector('.user-section');
-    userSection.addEventListener('click', () => {
-      userSection.classList.toggle('active');
-    });
-
-    editPictureLink.addEventListener('click', (event) => {
-      event.preventDefault();
-      pictureUpload.click();
-    });
-
-    pictureUpload.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      const reader = new FileReader();
-
-      reader.onload = (e) => {
-        const imageURL = e.target.result;
-        userSection.querySelector('.user-picture').style.backgroundImage = `url(${imageURL})`;
-      };
-
-      reader.readAsDataURL(file);
-    });
+  <script src="./scripts/dashboardScript.js">
+    
   </script>
 </body>
 </html>

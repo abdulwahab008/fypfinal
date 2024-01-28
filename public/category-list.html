@@ -141,7 +141,7 @@
   <h1>Categories</h1>
   
     <input type="text" id="categoryInput" placeholder="Enter category name">
-    <button id="categoryButton" onclick="addOrUpdateCategory()">Add Category</button>
+    <button id="categoryButton">Add Category</button>
   
   <table>
     <thead>
@@ -157,104 +157,8 @@
 </div>
 
 
-  <script>
-    let isEditing = false;
-    let editingCategoryId = null;
-
-    async function addOrUpdateCategory() {
-      const name = document.getElementById('categoryInput').value;
-
-      if (isEditing) {
-        // Handle update logic
-        const response = await fetch(`/categories/${editingCategoryId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name }),
-        });
-
-        const result = await response.json();
-        console.log(result);
-      } else {
-        // Handle add logic
-        const response = await fetch('/categories', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name }),
-        });
-
-        const result = await response.json();
-        console.log(result);
-      }
-
-      // Reset input and button state
-      document.getElementById('categoryInput').value = '';
-      document.getElementById('categoryButton').innerText = 'Add Category';
-      isEditing = false;
-
-      // Update category list
-      getCategoryList();
-    }
-
-    function startEditing(categoryId) {
-      // Set input field with the current category name
-      const categoryName = document.querySelector(`#categoryList tr[data-id="${categoryId}"] td:nth-child(2)`).innerText;
-      document.getElementById('categoryInput').value = categoryName;
-
-      // Change button to "Update"
-      document.getElementById('categoryButton').innerText = 'Update';
-      isEditing = true;
-      editingCategoryId = categoryId;
-    }
-
-    async function deleteCategory(categoryId) {
-      // Implement the delete functionality
-      const confirmDelete = confirm('Are you sure you want to delete this category?');
-      if (confirmDelete) {
-        // Make a DELETE request to delete the category
-        const response = await fetch(`/categories/${categoryId}`, {
-          method: 'DELETE',
-        });
-
-        const result = await response.json();
-        console.log(result);
-
-        // Update category list after deletion
-        getCategoryList();
-      }
-    }
-
-    async function getCategoryList() {
-      const response = await fetch('/categories');
-      const categories = await response.json();
-      const categoryList = document.getElementById('categoryList');
-      categoryList.innerHTML = '';
-
-      // Update the table with categories
-      const tableBody = document.getElementById('categoryList');
-      categories.forEach(category => {
-        const row = document.createElement('tr');
-        row.setAttribute('data-id', category.id);
-        row.innerHTML = `
-          <td>${category.id}</td>
-          <td>${category.name}</td>
-          <td>
-            <button onclick="startEditing(${category.id})">Edit</button>
-            <button onclick="deleteCategory(${category.id})">Delete</button>
-          </td>
-        `;
-        tableBody.appendChild(row);
-      });
-    }
-
-    // Initial load
-    getCategoryList();
-    function goBack() {
-      window.history.back();
-    }
+  <script src="./scripts/categoryScript.js">
+  
   </script>
 </body>
 </html>

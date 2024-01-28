@@ -21,11 +21,12 @@ async function saveToDatabase(data) {
 
         for (const row of data) {
             try {
-                await connection.query('INSERT INTO inventory (date, product_name, supplier_name, price, quantity, total) VALUES (?, ?, ?, ?, ?, ?)', [
+                await connection.query('INSERT INTO inventory (date, product_name, supplier_name, price,cost, quantity, total) VALUES (?, ?, ?, ?, ?, ?, ?)', [
                     row.date,
-                    row.productName, // Corrected property name
-                    row.supplierName, // Corrected property name
+                    row.productName, 
+                    row.supplierName, 
                     row.price,
+                    row.cost,
                     row.quantity,
                     row.total
                 ]);
@@ -67,9 +68,10 @@ async function fetchInventoryData() {
 
         return rows.map(row => ({
             date: row.date,
-            productName: row.product_name, // Ensure this matches your actual column name
-            supplierName: row.supplier_name, // Ensure this matches your actual column name
+            productName: row.product_name, 
+            supplierName: row.supplier_name, 
             price: row.price,
+            cost: row.cost,
             quantity: row.quantity,
             total: row.total
         }));
@@ -78,10 +80,21 @@ async function fetchInventoryData() {
         throw error;
     }
 }
+async function getStockReport(dateRange) {
+    try {
 
+  
+      const query = 'SELECT * FROM inventory WHERE date BETWEEN ? AND ?'; 
+      const [stock] = await pool.execute(query, [dateRange.fromDate, dateRange.toDate]);
+      return stock;
+    } catch (error) {
+      throw error;
+    }
+  }
 module.exports = {
     fetchProductNames,
     saveToDatabase,
     fetchSupplierNames,
     fetchInventoryData,
+    getStockReport
 };

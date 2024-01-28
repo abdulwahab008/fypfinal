@@ -28,8 +28,21 @@ async function getAllClosing() {
         throw error;
     }
 }
-
+async function getClosingReport(dateRange) {
+    try {
+      // Implement logic to fetch closing data based on dateRange and specificDate
+      // Use parameters to construct your SQL queries
+  
+      const query = 'SELECT * FROM closing WHERE date BETWEEN ? AND ? '; // Replace ... with your conditions
+      const [closing] = await pool.execute(query, [dateRange.fromDate, dateRange.toDate]);
+      return closing;
+    } catch (error) {
+      throw error;
+    }
+  }
+  
 module.exports = {
     saveClosing,
     getAllClosing,
+    getClosingReport
 };

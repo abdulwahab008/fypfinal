@@ -16,6 +16,8 @@ const giveloanRoutes = require('./src/routes/giveloanRoutes');
 const receiveloanRoutes = require('./src/routes/receiveloanRoutes'); 
 const commissionRoutes = require('./src/routes/commissionRoutes');
 const closingRoutes = require('./src/routes/closingRoutes');
+const reportRoutes = require('./src/routes/reportRoutes');
+const settingRoutes = require('./src/routes/settingRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,8 +32,10 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false } // Set to true if using HTTPS
 }));
-app.use(express.static(path.join(__dirname, 'public')));
+
+
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Product routes
 app.use('/api/products', productRoutes);
@@ -51,11 +55,26 @@ app.use('/customers', customerRoutes);
 app.use('/giveloans', giveloanRoutes);
 
 // Inventory routes
-app.use('/', inventoryRoutes);
+
+// Inventory routes
 app.use('/receiveloans', receiveloanRoutes);
 
 app.use('/api/commissions', commissionRoutes);
 app.use('/api/closings', closingRoutes);
+app.use('/', inventoryRoutes); 
+app.use('/api/reports', reportRoutes);
+app.use('/api', settingRoutes);
+const authenticateUser = (req, res, next) => {
+    if (req.session.user) {
+        // User is authenticated, proceed to the next middleware or route handler
+        next();
+    } else {
+        // User is not authenticated, send a JSON response
+        res.status(401).json({ error: 'Unauthorized' });
+    }
+};
+app.use(['/dashboard.html', '/sales.html', '/customer-list.html', '/commission.html', '/daily-closing.html', '/reports.html'], authenticateUser);
+
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
