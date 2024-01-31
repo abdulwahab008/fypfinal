@@ -88,8 +88,9 @@
     <div class="login-container">
         <h2>Login</h2>
         <form action="/api/users/login" method="post" onsubmit="return validateForm()">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <label for="emailOrUsername">Email or Username:</label>
+            <input type="text" id="emailOrUsername" name="emailOrUsername" required>
+            
             <br>
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>

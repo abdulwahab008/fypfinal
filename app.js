@@ -65,15 +65,16 @@ app.use('/', inventoryRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api', settingRoutes);
 const authenticateUser = (req, res, next) => {
+    console.log('Session Data:', req.session);
     if (req.session.user) {
         // User is authenticated, proceed to the next middleware or route handler
         next();
     } else {
-        // User is not authenticated, send a JSON response
-        res.status(401).json({ error: 'Unauthorized' });
+        // User is not authenticated, send a JSON response or redirect
+        console.log('Redirecting to login page');
+        res.redirect('/login.html');
     }
 };
-app.use(['/dashboard.html', '/sales.html', '/customer-list.html', '/commission.html', '/daily-closing.html', '/reports.html'], authenticateUser);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

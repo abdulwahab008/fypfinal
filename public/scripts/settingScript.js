@@ -1,5 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
-    
+   
+        const backButton=document.getElementById('back-button');
+        if(backButton){
+            backButton.addEventListener("click",goBack);
+        }
+   
 
     fetchUserData();
 
@@ -76,26 +81,6 @@ function displayImage(section, input) {
         reader.readAsDataURL(file);
     }
 }
-
-window.addEventListener('load', function () {
-    // Fetch user information from the server
-    fetch('/api/users/current')
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Unauthorized');
-            }
-        })
-        .then(data => {
-            // Update the user name in the dashboard
-            document.getElementById('username-display').innerText = data.user.name;
-
-            // Store user data in session storage
-            sessionStorage.setItem('currentUser', JSON.stringify(data.user));
-        })
-        .catch(error => {
-            // Handle unauthorized access, e.g., redirect to the login page
-            window.location.href = '/login.html'; // Adjust the URL based on your project structure
-        });
-});
+function goBack() {
+    window.history.back();
+  }

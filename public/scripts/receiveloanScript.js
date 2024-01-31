@@ -1,3 +1,21 @@
+document.addEventListener('DOMContentLoaded', async function(){
+    fetchUserData();
+    const searchButton=document.getElementById('searchButton');
+    if(searchButton){
+searchButton.addEventListener('click', searchTransaction);
+    }
+    const searchButtonTable=document.getElementById('searchButtonTable');
+    if(searchButtonTable){
+        searchButtonTable.addEventListener('click', searchAndHighlight )
+    }
+    const loanTypeSelect = document.getElementById('loan_type');
+    if (loanTypeSelect) {
+        loanTypeSelect.addEventListener('change', toggleInstallmentOption);
+    }
+    toggleInstallmentOption();
+} );
+
+
 document.getElementById('date').valueAsDate = new Date();
    
 function calculateRemainingAmount() {
@@ -184,42 +202,29 @@ function searchAndHighlight() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async function(){
-       
-    const searchButton=document.getElementById('searchButton');
-    if(searchButton){
-searchButton.addEventListener('click', searchTransaction);
-    }
-    const searchButtonTable=document.getElementById('searchButtonTable');
-    if(searchButtonTable){
-        searchButtonTable.addEventListener('click', searchAndHighlight )
-    }
-    const loanTypeSelect = document.getElementById('loan_type');
-    if (loanTypeSelect) {
-        loanTypeSelect.addEventListener('change', toggleInstallmentOption);
-    }
-    toggleInstallmentOption();
-} );
 
-window.addEventListener('load', function () {
-    // Fetch user information from the server
+function fetchUserData() {
+    // Make a fetch request to get user data
     fetch('/api/users/current')
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Unauthorized');
+            if (response.status === 401) {
+                // Redirect to the login page or handle unauthorized access
+                window.location.href = '/login.html';
+                throw new Error('User not authenticated');
             }
+            return response.json();
         })
-        .then(data => {
-            // Update the user name in the dashboard
-            document.getElementById('username-display').innerText = data.user.name;
+        .then(user => {
+            // Store the user data in session storage
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
 
-            // Store user data in session storage
-            sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+            // Log the stored user data for debugging
+            console.log('Stored currentUser:', JSON.stringify(user));
+
+            // Update the profile section immediately
+            updateProfileSection(user);
         })
         .catch(error => {
-            // Handle unauthorized access, e.g., redirect to the login page
-            window.location.href = '/login.html'; // Adjust the URL based on your project structure
+            console.error('Error fetching user information:', error);
         });
-});
+}

@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async function () {
+    //fetchUserData();
     const GenerateReport=document.getElementById('GenerateReport');
     if(GenerateReport){
         GenerateReport.addEventListener('click', generateReport);
@@ -47,38 +48,120 @@ function generateReport() {
   
 
 
-    function displayTable(data) {
-        var reportOutput = document.getElementById("report-output");
-    
-        // Create a table element
-        var table = document.createElement("table");
-    
-        // Create a header row
-        var headerRow = table.insertRow(0);
-        for (var key in data[0]) {
-          var th = document.createElement("th");
-          th.innerHTML = key;
-          headerRow.appendChild(th);
-        }
-    
-        // Create rows with data
-        for (var i = 0; i < data.length; i++) {
-          var row = table.insertRow(i + 1);
-          for (var key in data[i]) {
+  function displayTable(data) {
+    var reportOutput = document.getElementById("report-output");
+
+    // Calculate totals
+    var totalQuantity = 0;
+    var totalPrices = 0;
+    var totalCost = 0;
+    var totalProfit = 0;
+    var totalAmount = 0;
+    var totalComissionAmount=0;
+    var totalDiscount=0;
+    var totalDiscountAmount=0;
+
+
+    // Create a table element
+    var table = document.createElement("table");
+
+    // Create a header row
+    var headerRow = table.insertRow(0);
+    for (var key in data[0]) {
+        var th = document.createElement("th");
+        th.innerHTML = key;
+        headerRow.appendChild(th);
+    }
+
+    // Create rows with data
+    for (var i = 0; i < data.length; i++) {
+        var row = table.insertRow(i + 1);
+        for (var key in data[i]) {
             var cell = row.insertCell();
-            
+
             // Check if the current key is 'date' and format it
             if (key === 'date') {
-              cell.innerHTML = formatDate(data[i][key]);
+                cell.innerHTML = formatDate(data[i][key]);
             } else {
-              cell.innerHTML = data[i][key];
+                cell.innerHTML = data[i][key];
             }
-          }
-        }
 
-  // Append the table to the reportOutput element
-  reportOutput.appendChild(table);
+            // Calculate totals for quantity, prices, cost, profit, and total
+            if (key === 'quantity') {
+                totalQuantity += parseInt(data[i][key]);
+            } else if (key === 'price') {
+                totalPrices += parseFloat(data[i][key]);
+            } else if (key === 'cost') {
+                totalCost += parseFloat(data[i][key]);
+            } else if (key === 'profit') {
+                totalProfit += parseFloat(data[i][key]);
+            } else if (key === 'total') {
+                totalAmount += parseFloat(data[i][key]);
+            }else if (key === 'amount') {
+                totalComissionAmount += parseFloat(data[i][key]);
+            }else if (key === 'discount') {
+                totalDiscount += parseFloat(data[i][key]);
+            }
+            else if (key === 'discountAmount') {
+                totalDiscountAmount += parseFloat(data[i][key]);
+            }
+        }
+    }
+
+    // Display totals above the table
+    var totalRow = table.insertRow(data.length + 1);
+    for (var key in data[0]) {
+        var totalCell = totalRow.insertCell();
+
+        // Set totals only for quantity, prices, cost, profit, and total
+        if (key === 'quantity') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = "<span style='color:white;'>" + totalQuantity + "</span>";
+        } else if (key === 'price') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML =  totalPrices.toFixed(2);
+        } else if (key === 'cost') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML =  totalCost.toFixed(2);
+        } else if (key === 'profit') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = totalProfit.toFixed(2);
+        } else if (key === 'total') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = totalAmount.toFixed(2);
+        } 
+        else if (key === 'amount') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = totalComissionAmount.toFixed(2);
+        }
+        else if (key === 'discount') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = totalDiscount.toFixed(2);
+        }
+        else if (key === 'discountAmount') {
+            totalCell.style.fontWeight = "bold";
+            totalCell.style.backgroundColor = "orange";
+            totalCell.innerHTML = totalDiscountAmount.toFixed(2);
+        }
+        else {
+            // For other columns, leave them blank
+            totalCell.innerHTML = "";
+            totalCell.style.backgroundColor = "orange";
+        }
+    }
+
+    // Append the table to the reportOutput element
+    reportOutput.appendChild(table);
 }
+
+
 function formatDate(inputDate) {
     const date = new Date(inputDate);
   
@@ -97,25 +180,28 @@ function goBack() {
   window.history.back();
 }
 
-window.addEventListener('load', function () {
-    // Fetch user information from the server
+function fetchUserData() {
+    // Make a fetch request to get user data
     fetch('/api/users/current')
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Unauthorized');
+            if (response.status === 401) {
+                // Redirect to the login page or handle unauthorized access
+                window.location.href = '/login.html';
+                throw new Error('User not authenticated');
             }
+            return response.json();
         })
-        .then(data => {
-            // Update the user name in the dashboard
-            document.getElementById('username-display').innerText = data.user.name;
+        .then(user => {
+            // Store the user data in session storage
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
 
-            // Store user data in session storage
-            sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+            // Log the stored user data for debugging
+            console.log('Stored currentUser:', JSON.stringify(user));
+
+            // Update the profile section immediately
+            updateProfileSection(user);
         })
         .catch(error => {
-            // Handle unauthorized access, e.g., redirect to the login page
-            window.location.href = '/login.html'; // Adjust the URL based on your project structure
+            console.error('Error fetching user information:', error);
         });
-});
+}

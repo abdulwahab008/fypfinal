@@ -3,10 +3,11 @@ function validateForm() {
     return true;
 }
 function performLogin() {
-    const username = document.getElementById('username').value;
+    const emailOrUsername = document.getElementById('emailOrUsername').value;
     const password = document.getElementById('password').value;
 
-    console.log('Username:', username);
+
+    console.log('Username:', emailOrUsername);
     console.log('Password:', password);
 
     // Validate the form
@@ -20,8 +21,8 @@ function performLogin() {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            username: document.getElementById('username').value,
-            password: document.getElementById('password').value,
+            emailOrUsername,
+            password,
         }),
     
     

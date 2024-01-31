@@ -33,11 +33,14 @@ const UserController = {
     },
     login: async (req, res) => {
         try {
-            const { username, password } = req.body;
-            console.log('Received data:', { username, password });
+            const { emailOrUsername, password } = req.body;
+            console.log('Received data:', { emailOrUsername, password });
     
-            // Retrieve user data from the database based on the username
-            const user = await UserModel.getByUsername(username);
+            // Check if the provided value is an email or username
+            const isEmail = emailOrUsername.includes('@');
+            const user = isEmail
+                ? await UserModel.getByEmail(emailOrUsername)
+                : await UserModel.getByUsername(emailOrUsername);
     
             console.log('Retrieved user data:', user);
     
@@ -79,6 +82,7 @@ const UserController = {
                     console.error('req.sessionId:', req.sessionID);
                     console.error('user:', user);
                     throw new Error('One or more required parameters are undefined');
+                  
                 }
             } else {
                 // If password doesn't match, send an error response
@@ -101,6 +105,40 @@ const UserController = {
             }
         });
     },
+
+    changePassword: async (req, res) => {
+        try {
+            const { oldPassword, newPassword } = req.body;
+
+            // Check if the user is authenticated
+            if (!req.session.user) {
+                return res.status(401).json({ error: 'User not authenticated' });
+            }
+
+            // Retrieve user data from the session
+            const { id, password: storedPassword } = req.session.user;
+
+            // Check if the old password matches the stored password
+            const passwordMatch = await bcrypt.compare(oldPassword, storedPassword);
+
+            if (!passwordMatch) {
+                return res.status(401).json({ error: 'Invalid old password' });
+            }
+
+            // Hash the new password
+            const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+
+            // Update the user's password in the database
+            await UserModel.updatePassword(id, hashedNewPassword);
+
+            // Return success message
+            return res.status(200).json({ message: 'Password changed successfully' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    },
 };
+
 
 module.exports = UserController;

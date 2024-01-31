@@ -7,17 +7,23 @@
     <title>User Settings</title>
     <style>
         body {
+            background: linear-gradient(to right, #1a1a1a, #1a1a1a);
+            color: #ffffff;
             font-family: 'Arial', sans-serif;
-            background: #1a1a2e;
-            color: #fff;
-            margin: 0;
-            height: 100vh;
-            flex-direction: column;
-        }
-        .container {
             display: flex;
-            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        #profileContent {
+            background-color: #262626;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            width: 500px;
+            text-align: center;
+            animation: fadeIn 1s;
         }
 
         h1 {
@@ -59,16 +65,14 @@
         }
 
         input {
-            width: calc(100% - 24px);
-            padding: 12px;
-            box-sizing: border-box;
+            width: 100%;
+            padding: 10px;
             margin-bottom: 15px;
-            border: none;
+            box-sizing: border-box;
+            border: 1px solid #555555;
             border-radius: 5px;
-            background-color: #222b3e;
-            color: #fff;
-            font-size: 16px;
-            display: inline-block;
+            background-color: #333333;
+            color: #ffffff;
         }
 
         #profilePictureContainer,
@@ -100,28 +104,36 @@
         }
 
         button {
-            width: calc(100% - 24px);
             background-color: #ef8354;
-            color: #fff;
-            padding: 14px;
+            color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
-            font-size: 18px;
-            display: inline-block;
+            align-items: center;
+            justify-content: center;
         }
 
         button:hover {
             background-color: #d8572a;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
         }
     </style>
 </head>
 
 <body>
     
-
+    
     <div id="profileContent" class="content">
+        <form id="profile">
         <h2>Profile</h2>
       
         <label for="profileName">Name:</label>
@@ -132,7 +144,9 @@
         <input type="text" id="profileEmail" name="profileEmail" readonly>
         <label for="profilePhone">Phone No.:</label>
         <input type="text" id="profilePhone" name="profilePhone" readonly>
-        
+       
+    </form>
+    <button id ="back-button">Back</button>
     </div>
 
     

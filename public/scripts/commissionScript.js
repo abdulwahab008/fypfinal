@@ -7,6 +7,7 @@ function getCurrentDate() {
 }
   
   document.addEventListener('DOMContentLoaded', function () {
+    fetchUserData();
     fetchCommissions();
     var dateInput = document.getElementById('date');
     dateInput.value = getCurrentDate();
@@ -129,12 +130,7 @@ function isSameDate(dateString1, dateString2) {
 
 
   
- // console.log('Table HTML:', table.innerHTML);
-
- // console.log('Current Date:', currentDate);
- // console.log('Table Rows:', table.rows.length);
- // console.log('Commission Rows:', commissions.length);
-//}
+ 
 
 
 
@@ -187,25 +183,28 @@ function goBack() {
   window.history.back();
 }
 
-window.addEventListener('load', function () {
-    // Fetch user information from the server
+function fetchUserData() {
+    // Make a fetch request to get user data
     fetch('/api/users/current')
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error('Unauthorized');
+            if (response.status === 401) {
+                // Redirect to the login page or handle unauthorized access
+                window.location.href = '/login.html';
+                throw new Error('User not authenticated');
             }
+            return response.json();
         })
-        .then(data => {
-            // Update the user name in the dashboard
-            document.getElementById('username-display').innerText = data.user.name;
+        .then(user => {
+            // Store the user data in session storage
+            sessionStorage.setItem('currentUser', JSON.stringify(user));
 
-            // Store user data in session storage
-            sessionStorage.setItem('currentUser', JSON.stringify(data.user));
+            // Log the stored user data for debugging
+            console.log('Stored currentUser:', JSON.stringify(user));
+
+            // Update the profile section immediately
+            updateProfileSection(user);
         })
         .catch(error => {
-            // Handle unauthorized access, e.g., redirect to the login page
-            window.location.href = '/login.html'; // Adjust the URL based on your project structure
+            console.error('Error fetching user information:', error);
         });
-});
+}

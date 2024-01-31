@@ -44,6 +44,32 @@ const UserModel = {
         }
     },
 
+    getByEmail: async (email) => {
+        let connection;
+
+        try {
+            console.log('Type of email:', typeof email);
+            console.log('Email:', email);
+
+            if (typeof email !== 'string') {
+                throw new Error('Email is not a valid string');
+            }
+
+            connection = await db.getConnection();
+            const [rows] = await connection.execute('SELECT * FROM users WHERE email = ?', [email]);
+
+            return rows.length > 0 ? rows[0] : null;
+        } catch (error) {
+            console.error('Error getting user by email:', error);
+            throw error;
+        } finally {
+            if (connection) {
+                connection.release();
+            }
+        }
+    },
+
+
     saveSessionData: async (userId, sessionId, expirationDate) => {
         try {
             if (userId === undefined || sessionId === undefined || expirationDate === undefined) {
@@ -77,6 +103,20 @@ const UserModel = {
             throw error;
         }
     },
-};
+    updatePassword: async (userId, newPassword) => {
+        const connection = await db.getConnection();
 
+        try {
+            await connection.execute(
+                'UPDATE users SET password = ? WHERE id = ?',
+                [newPassword, userId]
+            );
+        } catch (error) {
+            console.error('Error updating password:', error);
+            throw error; // Rethrow the error
+        } finally {
+            connection.release();
+        }
+    },
+};
 module.exports = UserModel;

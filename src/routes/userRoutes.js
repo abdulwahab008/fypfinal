@@ -9,6 +9,7 @@ router.post('/signup', UserController.signup);
 
 // Login route
 router.post('/login', UserController.login);
+router.post('/change-password', UserController.changePassword);
 router.get('/current', (req, res) => {
     if (req.session.user) {
         res.status(200).json({ user: req.session.user });
@@ -16,4 +17,5 @@ router.get('/current', (req, res) => {
         res.status(401).json({ error: 'User not authenticated' });
     }
 });
+router.post('/logout', UserController.logout);
 module.exports = router;
