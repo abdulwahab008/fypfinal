@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 
@@ -157,3 +158,150 @@
 </body>
 
 </html>
+=======
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Settings</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            margin: 0;
+            height: 100vh;
+            flex-direction: column;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #ef8354;
+            margin-bottom: 20px;
+        }
+
+        nav {
+            background-color: #333;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px 0;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #555;
+        }
+
+        .content {
+            margin: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #f9f9f9;
+        }
+
+        input {
+            width: calc(100% - 24px);
+            padding: 12px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #222b3e;
+            color: #fff;
+            font-size: 16px;
+            display: inline-block;
+        }
+
+        #profilePictureContainer,
+        #updatePictureContainer {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        #profilePictureContainer img,
+        #updatePictureContainer img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #pictureInput {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        button {
+            width: calc(100% - 24px);
+            background-color: #ef8354;
+            color: #fff;
+            padding: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 18px;
+            display: inline-block;
+        }
+
+        button:hover {
+            background-color: #d8572a;
+        }
+    </style>
+</head>
+
+<body>
+    
+
+    <div id="profileContent" class="content">
+        <h2>Profile</h2>
+      
+        <label for="profileName">Name:</label>
+        <input type="text" id="profileName" name="profileName" readonly>
+        <label for="profileUsername">Username:</label>
+        <input type="text" id="profileUsername" name="profileUsername" readonly>
+        <label for="profileEmail">Email:</label>
+        <input type="text" id="profileEmail" name="profileEmail" readonly>
+        <label for="profilePhone">Phone No.:</label>
+        <input type="text" id="profilePhone" name="profilePhone" readonly>
+        
+    </div>
+
+    
+
+    <script src="./scripts/settingScript.js">
+      
+    </script>
+</body>
+
+</html>
+>>>>>>> 2c2e4ab06074b0f32b83f4269ac4a737b98d0225

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Example in your productRoutes.js
 const express = require('express');
 const router = express.Router();
@@ -10,3 +11,17 @@ router.put('/:sku', productController.updateProduct); // Add this line for updat
 router.delete('/:sku', productController.deleteProduct); // Add this line for deleting a product
 
 module.exports = router;
+=======
+// Example in your productRoutes.js
+const express = require('express');
+const router = express.Router();
+const productController = require('../controllers/productController');
+
+router.get('/categories', productController.getCategories);
+router.get('/', productController.getAllProducts);
+router.post('/', productController.createProduct);
+router.put('/:sku', productController.updateProduct); // Add this line for updating a product
+router.delete('/:sku', productController.deleteProduct); // Add this line for deleting a product
+
+module.exports = router;
+>>>>>>> 2c2e4ab06074b0f32b83f4269ac4a737b98d0225
